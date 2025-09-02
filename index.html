@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>愿望清单 - 你的需求，我来实现</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .wish-form {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .wish-input {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .wish-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-vote {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-vote:hover {
+            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.4);
+        }
+
+        .wish-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.2s;
+        }
+
+        .wish-item:hover {
+            transform: translateX(5px);
+        }
+
+        .wish-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .wish-text {
+            flex: 1;
+            min-width: 200px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .wish-votes {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vote-count {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .vote-count-weak {
+            background: #e0e0e0;
+            color: #999;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-weight: normal;
+            font-size: 12px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .btn-view-implementation {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-view-implementation:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .admin-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .admin-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .admin-icon:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .admin-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+        }
+
+        .admin-modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            min-width: 300px;
+            text-align: center;
+        }
+
+        .admin-login {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .admin-status-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            min-width: 200px;
+            margin-top: 10px;
+        }
+
+        .admin-input {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .admin-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-admin {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .btn-admin:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-admin-action {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-left: 5px;
+            transition: all 0.2s;
+        }
+
+        .btn-admin-action:hover {
+            background: linear-gradient(45deg, #c82333, #bd2130);
+        }
+
+        .btn-move-to-implementing {
+            background: linear-gradient(45deg, #ffc107, #e0a800);
+            color: #333;
+        }
+
+        .btn-move-to-implementing:hover {
+            background: linear-gradient(45deg, #e0a800, #d39e00);
+        }
+
+        .admin-status {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .admin-logout {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .implemented-item {
+            border-left-color: #28a745;
+        }
+
+        .implementing-item {
+            border-left-color: #ffc107;
+        }
+
+        .implemented-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .implemented-link:hover {
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        .examples {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .examples h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .examples ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .examples li {
+            background: white;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 3px solid #1976d2;
+        }
+
+        @media (max-width: 768px) {
+            .wish-form {
+                flex-direction: column;
+            }
+            
+            .wish-input {
+                min-width: auto;
+            }
+            
+            .wish-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 站长管理面板 -->
+    <div class="admin-panel">
+        <div id="adminIcon" class="admin-icon" onclick="showAdminModal()">
+            ⚙️
+        </div>
+        <div id="adminStatusPanel" class="admin-status-panel" style="display: none;">
+            <div class="admin-status">👑 站长已登录</div>
+            <button onclick="adminLogout()" class="admin-logout">退出登录</button>
+        </div>
+    </div>
+
+    <!-- 站长登录模态框 -->
+    <div id="adminModal" class="admin-modal" onclick="hideAdminModal(event)">
+        <div class="admin-modal-content" onclick="event.stopPropagation()">
+            <h3 style="margin-bottom: 20px; color: #667eea;">站长登录</h3>
+            <div class="admin-login">
+                <input type="password" id="adminPassword" class="admin-input" placeholder="输入站长密码">
+                <button onclick="adminLogin()" class="btn-admin">登录</button>
+                <button onclick="hideAdminModal()" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🌟 愿望清单</h1>
+            <p>你的需求，我来实现</p>
+        </div>
+
+        <!-- 已实现愿望 -->
+        <div class="section">
+            <h2>✅ 已实现愿望</h2>
+            <div id="implementedWishes">
+                <div class="empty-state">暂无已实现的愿望，期待第一个愿望的实现！</div>
+            </div>
+        </div>
+
+        <!-- 愿望实现中 -->
+        <div class="section">
+            <h2>🚀 愿望实现中</h2>
+            <div id="implementingWishes">
+                <div class="empty-state">暂无正在实现的愿望</div>
+            </div>
+        </div>
+
+        <!-- 许愿区域 -->
+        <div class="section">
+            <h2>💫 许下你的愿望</h2>
+            <div class="examples">
+                <h3>愿望示例：</h3>
+                <ul>
+                    <li>希望有一个网站能够帮我将图片去掉水印，并且不收费</li>
+                    <li>需要一个Excel公式来计算复合年增长率</li>
+                    <li>想要一个简单的番茄钟工具帮助提高工作效率</li>
+                    <li>希望有个工具能够批量重命名文件</li>
+                </ul>
+            </div>
+            <div class="wish-form">
+                <input type="text" id="wishInput" class="wish-input" placeholder="说出你希望解决的问题或希望实现的功能..." maxlength="200">
+                <button onclick="addWish()" class="btn">许愿</button>
+            </div>
+        </div>
+
+        <!-- 愿望清单 -->
+        <div class="section">
+            <h2>📋 愿望清单</h2>
+            <div id="wishList">
+                <div class="empty-state">暂无愿望，快来许下第一个愿望吧！</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数据存储
+        let wishes = [];
+        let implementingWishes = [];
+        let implementedWishes = [];
+        let lastWeeklyCheck = 0;
+        
+        // 站长管理
+        let isAdmin = false;
+        const ADMIN_PASSWORD = 'zhanzhangdenglu';
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+        });
+
+        // 从服务器加载数据
+        async function loadData() {
+            try {
+                const response = await fetch('/api/data');
+                const data = await response.json();
+                wishes = data.wishes || [];
+                implementingWishes = data.implementingWishes || [];
+                implementedWishes = data.implementedWishes || [];
+                lastWeeklyCheck = data.lastWeeklyCheck || 0;
+                
+                checkWeeklyUpdate();
+                renderWishes();
+                renderImplementingWishes();
+                renderImplementedWishes();
+            } catch (error) {
+                console.error('加载数据失败:', error);
+                alert('加载数据失败，请刷新页面重试');
+            }
+        }
+
+        // 添加愿望
+        async function addWish() {
+            const wishInput = document.getElementById('wishInput');
+            const wishText = wishInput.value.trim();
+            
+            if (!wishText) {
+                alert('请输入你的愿望！');
+                return;
+            }
+            
+            if (wishText.length > 200) {
+                alert('愿望描述不能超过200个字符！');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/wishes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: wishText })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    wishes.push(result.wish);
+                    renderWishes();
+                    wishInput.value = '';
+                    alert('愿望许下成功！');
+                } else {
+                    alert('许愿失败：' + result.error);
+                }
+            } catch (error) {
+                console.error('许愿失败:', error);
+                alert('许愿失败，请重试');
+            }
+        }
+
+        // 投票
+        async function vote(wishId) {
+            try {
+                const response = await fetch('/api/vote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ wishId: wishId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    const wish = wishes.find(w => w.id === wishId);
+                    if (wish) {
+                        wish.votes = result.votes;
+                        renderWishes();
+                    }
+                } else {
+                    alert('投票失败：' + result.error);
+                }
+            } catch (error) {
+                console.error('投票失败:', error);
+                alert('投票失败，请重试');
+            }
+        }
+
+        // 渲染愿望清单
+        function renderWishes() {
+            const wishList = document.getElementById('wishList');
+            
+            if (wishes.length === 0) {
+                wishList.innerHTML = '<div class="empty-state">暂无愿望，快来许下第一个愿望吧！</div>';
+                return;
+            }
+            
+            // 按票数排序
+            const sortedWishes = [...wishes].sort((a, b) => b.votes - a.votes);
+            
+            wishList.innerHTML = sortedWishes.map(wish => `
+                <div class="wish-item">
+                    <div class="wish-content">
+                        <div class="wish-text">${escapeHtml(wish.text)}</div>
+                        <div class="wish-votes">
+                            <span class="vote-count">${wish.votes} 票</span>
+                            <button onclick="vote(${wish.id})" class="btn btn-vote">投票</button>
+                            ${isAdmin ? `
+                                <button onclick="moveToImplementing(${wish.id})" class="btn-admin-action btn-move-to-implementing">移入实现中</button>
+                                <button onclick="deleteWish(${wish.id})" class="btn-admin-action">删除</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 渲染实现中的愿望
+        function renderImplementingWishes() {
+            const implementingList = document.getElementById('implementingWishes');
+            
+            if (implementingWishes.length === 0) {
+                implementingList.innerHTML = '<div class="empty-state">暂无正在实现的愿望</div>';
+                return;
+            }
+            
+            implementingList.innerHTML = implementingWishes.map(wish => `
+                <div class="wish-item implementing-item">
+                    <div class="wish-content">
+                        <div class="wish-text">${escapeHtml(wish.text)}</div>
+                        <div class="wish-votes">
+                            <span class="vote-count">${wish.votes} 票</span>
+                        </div>
+                    </div>
+                    <input type="url" class="url-input" placeholder="请输入实现网站的URL地址" 
+                           onkeypress="if(event.key==='Enter') completeWish(${wish.id}, this.value)">
+                    <button onclick="completeWish(${wish.id}, this.previousElementSibling.value)" 
+                            class="btn" style="margin-top: 10px;">标记为已完成</button>
+                </div>
+            `).join('');
+        }
+
+        // 渲染已实现的愿望
+        function renderImplementedWishes() {
+            const implementedList = document.getElementById('implementedWishes');
+            
+            if (implementedWishes.length === 0) {
+                implementedList.innerHTML = '<div class="empty-state">暂无已实现的愿望，期待第一个愿望的实现！</div>';
+                return;
+            }
+            
+            implementedList.innerHTML = implementedWishes.map(wish => `
+                <div class="wish-item implemented-item">
+                    <div class="wish-content">
+                        <div class="wish-text">${escapeHtml(wish.text)}</div>
+                        <div class="wish-votes">
+                            <span class="vote-count-weak">${wish.votes} 票</span>
+                            <a href="${wish.url}" target="_blank" class="btn-view-implementation">🔗 查看实现</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 完成愿望
+        async function completeWish(wishId, url) {
+            if (!url || !isValidUrl(url)) {
+                alert('请输入有效的URL地址！');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/complete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ wishId: wishId, url: url })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 重新加载数据以确保同步
+                    await loadData();
+                    alert('愿望标记为已完成！');
+                } else {
+                    alert('操作失败：' + result.error);
+                }
+            } catch (error) {
+                console.error('完成愿望失败:', error);
+                alert('操作失败，请重试');
+            }
+        }
+
+        // 检查每周更新
+        async function checkWeeklyUpdate() {
+            try {
+                const response = await fetch('/api/weekly-check', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.movedWish) {
+                    // 直接重新渲染数据，避免循环调用loadData
+                    const dataResponse = await fetch('/api/data');
+                    const data = await dataResponse.json();
+                    wishes = data.wishes || [];
+                    implementingWishes = data.implementingWishes || [];
+                    implementedWishes = data.implementedWishes || [];
+                    lastWeeklyCheck = data.lastWeeklyCheck || 0;
+                    
+                    renderWishes();
+                    renderImplementingWishes();
+                    renderImplementedWishes();
+                    
+                    // 只有在真正移动了愿望时才显示弹窗
+                    if (result.movedWish.text && result.movedWish.text !== 'undefined') {
+                        alert(`恭喜！愿望"${result.movedWish.text}"获得最高票数，已进入实现阶段！`);
+                    }
+                }
+            } catch (error) {
+                console.error('周检查失败:', error);
+                // 周检查失败不影响正常使用，只记录错误
+            }
+        }
+
+        // HTML转义
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 验证URL
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // 回车键提交愿望
+        document.getElementById('wishInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addWish();
+            }
+        });
+        
+        // 站长密码输入框回车键登录
+        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                adminLogin();
+            }
+        });
+        
+        // ESC键关闭模态框
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideAdminModal();
+            }
+        });
+        
+        // 显示站长登录模态框
+        function showAdminModal() {
+            if (isAdmin) {
+                return; // 如果已经登录，不显示模态框
+            }
+            document.getElementById('adminModal').style.display = 'flex';
+            document.getElementById('adminPassword').focus();
+        }
+        
+        // 隐藏站长登录模态框
+        function hideAdminModal(event) {
+            if (event && event.target !== document.getElementById('adminModal')) {
+                return;
+            }
+            document.getElementById('adminModal').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+        }
+        
+        // 站长登录
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                document.getElementById('adminIcon').style.display = 'none';
+                document.getElementById('adminStatusPanel').style.display = 'block';
+                hideAdminModal();
+                // 重新渲染所有列表以显示管理按钮
+                renderWishes();
+                renderImplementingWishes();
+                renderImplementedWishes();
+                alert('站长登录成功！');
+            } else {
+                alert('密码错误！');
+                document.getElementById('adminPassword').value = '';
+            }
+        }
+        
+        // 站长登出
+        function adminLogout() {
+            isAdmin = false;
+            document.getElementById('adminIcon').style.display = 'flex';
+            document.getElementById('adminStatusPanel').style.display = 'none';
+            // 重新渲染所有列表以隐藏管理按钮
+            renderWishes();
+            renderImplementingWishes();
+            renderImplementedWishes();
+        }
+        
+        // 删除愿望
+        async function deleteWish(wishId) {
+            if (!isAdmin) {
+                alert('权限不足！');
+                return;
+            }
+            
+            if (!confirm('确定要删除这个愿望吗？此操作不可撤销！')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/delete-wish', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ wishId: wishId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    wishes = wishes.filter(w => w.id !== wishId);
+                    renderWishes();
+                    alert('愿望删除成功！');
+                } else {
+                    alert('删除失败：' + result.error);
+                }
+            } catch (error) {
+                console.error('删除愿望失败:', error);
+                alert('删除失败，请重试');
+            }
+        }
+        
+        // 移动愿望到实现中
+        async function moveToImplementing(wishId) {
+            if (!isAdmin) {
+                alert('权限不足！');
+                return;
+            }
+            
+            if (!confirm('确定要将这个愿望移入实现中吗？')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/move-to-implementing', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ wishId: wishId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // 重新加载数据以确保同步
+                    await loadData();
+                    alert('愿望已移入实现中！');
+                } else {
+                    alert('移动失败：' + result.error);
+                }
+            } catch (error) {
+                console.error('移动愿望失败:', error);
+                alert('移动失败，请重试');
+            }
+        }
+        
+        // 站长密码输入框回车登录
+        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                adminLogin();
+            }
+        });
+    </script>
+</body>
+</html>

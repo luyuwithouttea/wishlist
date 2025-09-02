@@ -1,0 +1,37 @@
+{
+  "wishes": [
+    {
+      "text": "希望有一个网站能够帮我将图片去掉水印，并且不收费",
+      "id": 1749480983685,
+      "votes": 0,
+      "timestamp": "2025-06-09T14:56:23.685Z"
+    }
+  ],
+  "implementingWishes": [
+    {
+      "text": "需要一个抠图工具，不收费的",
+      "id": 1749481828977,
+      "votes": 1,
+      "timestamp": "2025-06-09T15:10:28.977Z"
+    }
+  ],
+  "implementedWishes": [
+    {
+      "text": "希望有一个指导我投资赚大钱的工具！~",
+      "id": 1749479984195,
+      "votes": 25,
+      "timestamp": "2025-06-09T14:39:44.195Z",
+      "url": "https://ysahljlbttkj.sealosbja.site",
+      "completedAt": "2025-06-18T09:54:27.744Z"
+    },
+    {
+      "text": "我希望能有一个排班工具，值班排班好麻烦，希望可以有请假功能~",
+      "id": 1749479891868,
+      "votes": 14,
+      "timestamp": "2025-06-09T14:38:11.868Z",
+      "url": "https://qzwwctoeszlo.sealosbja.site/",
+      "completedAt": "2025-06-09T14:38:34.536Z"
+    }
+  ],
+  "lastWeeklyCheck": 1750240432521
+}
